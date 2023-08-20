@@ -1,41 +1,55 @@
-import {Plugin} from 'obsidian'
+/* eslint-disable no-mixed-spaces-and-tabs */
+import { MarkdownView, Plugin, WorkspaceLeaf } from "obsidian";
 
+export default class CycleThroughPanes extends Plugin {
 
-export default class ExamplePlugin extends Plugin{
-	statusBarElement: HTMLSpanElement;
+  onload() {
+    console.log('loading plugin: Cycle through panes');
 
-	onload() {
-		this.statusBarElement = this.addStatusBarItem().createEl("span");
-
-		this.readActiveFileAndUpdateLineCount();
-
-		this.app.workspace.on("editor-change", (editor) => {
-			const content = editor.getDoc().getValue();
-			this.updateLineCount(content);
-		});
-
-		this.app.workspace.on("active-leaf-change", () => {
-			this.readActiveFileAndUpdateLineCount();
-		});
-	}
-
-	onunload() {
-		this.statusBarElement.remove();
-	}
-
-	private async readActiveFileAndUpdateLineCount() {
-		const file = this.app.workspace.getActiveFile();
-		if (file) {
-			const content = await this.app.vault.read(file);
-			this.updateLineCount(content);
-		} else {
-			this.updateLineCount(undefined);
+	this.addCommand({
+		id: 'cycle-through-panes',
+		name: 'Cycle through Panes'
+		checkCallback: (checking: boolean) => {
+			const active = this.app.workspace.activeLeaf;
+			if (active) {
+				if (!checking) {
+					const leafs = this.app.workspace.getLeavesOfType("markdown");
+					const index = leafs.indexOf(active);
+					if (index === leafs.length - 1) {
+						this.app.workspace.setActiveLeaf(leafs[0], true, true);
+					} else {
+						this.app.workspace.setActiveLeaf(leafs[index + 1], true, true);
+					}
+				}
+				return true;
+			}
+			return false;
 		}
-	}
+	});
 
-	private updateLineCount(fileContent?: string) {
-		const count = fileContent ? fileContent.split(/\r\n|\r|\n/).length : 0;
-		const linesWord = count === 1 ? "linea" : "lineas";
-		this.statusBarElement.textContent = `${count} ${linesWord}`;
-	}
+	this.addCommand({
+		id: 'cycle-through-panes-back',
+		name: 'Cycle through Panes Back',
+		checkCallback: (checking: boolean) => {
+			const active = this.app.workspace.activeLeaf;
+			if (active) {
+				if (!checking) {
+					const leafs = this.app.workspace.getLeavesOfType("markdown");
+					const index = leafs.indexOf(active);
+					if (index === 0) {
+						this.app.workspace.setActiveLeaf(leafs[leafs.length - 1], true, true);
+					} else {
+						this.app.workspace.setActiveLeaf(leafs[index - 1], true, true);
+					}
+				}
+				return true;
+			}
+			return false;
+		}
+	});
+  }
+
+  onunload() {
+    console.log('unloading plugin: Cycle through panes');
+  }
 }

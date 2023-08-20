@@ -1,6 +1,6 @@
 {
-	"id": "better-status-bar",
-	"name": "Better Status Bar",
+	"id": "pacos-obsidian-plugin",
+	"name": "Paco's plugin",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
 	"description": "This is a sample plugin for Obsidian. This plugin demonstrates some of the capabilities of the Obsidian API.",
